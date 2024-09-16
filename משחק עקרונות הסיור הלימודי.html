@@ -1,0 +1,252 @@
+import React, { useState, useEffect } from 'react';
+import { AlertCircle, CheckCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
+const questions = [
+  {
+    question: "מהו אחד היתרונות המרכזיים של הסיור הלימודי?",
+    answers: [
+      "שינוי בסביבת הלמידה",
+      "חיסכון בעלויות",
+      "הפחתת עומס על המורים",
+      "הארכת יום הלימודים"
+    ],
+    correct: 0
+  },
+  {
+    question: "על מה מבוססת הלמידה החוץ-כיתתית?",
+    answers: [
+      "למידה פרונטלית",
+      "למידה חווייתית",
+      "למידה מקוונת",
+      "למידה תיאורטית"
+    ],
+    correct: 1
+  },
+  {
+    question: "מהו אחד ההיבטים החינוכיים החשובים בסיור לימודי?",
+    answers: [
+      "הפחתת זמן מסך",
+      "למידה פסיבית",
+      "למידה פעילה",
+      "הימנעות מאינטראקציה חברתית"
+    ],
+    correct: 2
+  },
+  {
+    question: "מה מאפשרות האינטראקציות החברתיות בסיור הלימודי?",
+    answers: [
+      "הפחתת עומס על המורים",
+      "הגברת המעורבות הרגשית והחברתית בלמידה",
+      "הקטנת זמן הלמידה",
+      "הפחתת הצורך בתכנון מוקדם"
+    ],
+    correct: 1
+  },
+  {
+    question: "מהו תפקיד המורה בסיור הלימודי?",
+    answers: [
+      "צופה פסיבי",
+      "מנחה ומתווך",
+      "מרצה ראשי",
+      "מפקח חיצוני"
+    ],
+    correct: 1
+  },
+  {
+    question: "מה חשוב לעשות בסיום הסיור?",
+    answers: [
+      "לשכוח מהחוויה",
+      "לערוך מבחן מסכם",
+      "לערוך פעילויות סיכום",
+      "לתכנן מיד את הסיור הבא"
+    ],
+    correct: 2
+  },
+  {
+    question: "איזו גישה חינוכית מוזכרת בהקשר של למידה משמעותית בסיור?",
+    answers: [
+      "הביהביוריזם",
+      "הקוגניטיביזם",
+      "הקונסטרוקטיביזם החברתי",
+      "האקזיסטנציאליזם"
+    ],
+    correct: 2
+  },
+  {
+    question: "מה מהבאים אינו חלק משלבי תכנון וביצוע סיור לימודי?",
+    answers: [
+      "מיפוי תכנית הלימודים",
+      "בחירת נושא לימוד עיקרי",
+      "הכנת משימות לתלמידים",
+      "קביעת ציונים סופיים"
+    ],
+    correct: 3
+  },
+  {
+    question: "איזו השפעה יש לסיור הלימודי על הזיכרון של התלמידים?",
+    answers: [
+      "אין השפעה",
+      "משפר את הזיכרון לטווח קצר בלבד",
+      "מחליש את הזיכרון",
+      "משפר את הזיכרון וההבנה ארוכת הטווח"
+    ],
+    correct: 3
+  },
+  {
+    question: "מהי אחת המטרות של הכנה מוקדמת לקראת הסיור?",
+    answers: [
+      "להפחית את ההתרגשות של התלמידים",
+      "להכין את התלמידים מבחינה קוגניטיבית ופסיכולוגית",
+      "לבטל את הצורך בהסברים במהלך הסיור",
+      "להחליף את הסיור בלמידה בכיתה"
+    ],
+    correct: 1
+  }
+];
+
+const QuizGame = () => {
+  const [name, setName] = useState('');
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+  const [answered, setAnswered] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [gameStarted, setGameStarted] = useState(false);
+
+  const handleAnswer = (index) => {
+    if (answered) return;
+    setAnswered(true);
+    setSelectedAnswer(index);
+    if (index === questions[currentQuestion].correct) {
+      setScore(score + 10);
+    }
+  };
+
+  const nextQuestion = () => {
+    setAnswered(false);
+    setSelectedAnswer(null);
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    } else {
+      setShowResult(true);
+    }
+  };
+
+  const restartGame = () => {
+    setCurrentQuestion(0);
+    setScore(0);
+    setShowResult(false);
+    setAnswered(false);
+    setSelectedAnswer(null);
+    setGameStarted(false);
+    setName('');
+  };
+
+  const getFeedback = () => {
+    const percentage = (score / (questions.length * 10)) * 100;
+    if (percentage >= 80) return "מצוין! יש לך הבנה מעמיקה של נושא הסיור הלימודי.";
+    if (percentage >= 60) return "טוב מאוד! יש לך ידע טוב בנושא, אך יש מקום לשיפור.";
+    return "כדאי לחזור על החומר. הסיור הלימודי הוא כלי חשוב בהוראה.";
+  };
+
+  if (!gameStarted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-600 to-orange-400 flex items-center justify-center" dir="rtl">
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-right">
+          <h1 className="text-3xl font-bold text-center text-purple-800 mb-6">האקדמית חמדת</h1>
+          <h2 className="text-xl font-semibold text-center text-orange-600 mb-4">השתלמות - הסיור הלימודי ושילובו בהוראה</h2>
+          <h3 className="text-lg font-medium text-center text-purple-600 mb-8">עקרונות בתכנון הסיור הלימודי</h3>
+          <input
+            type="text"
+            placeholder="מה שמך?"
+            className="w-full p-2 border border-purple-300 rounded mb-4 text-right"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <button
+            className="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition duration-300"
+            onClick={() => {
+              if (name.trim()) {
+                setGameStarted(true);
+              }
+            }}
+          >
+            התחל במשחק
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (showResult) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-600 to-orange-400 flex items-center justify-center" dir="rtl">
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+          <h2 className="text-2xl font-bold text-purple-800 mb-4">תוצאות המשחק</h2>
+          <p className="text-xl mb-4">הניקוד שלך: {score} מתוך {questions.length * 10}</p>
+          <p className="text-lg mb-6">{getFeedback()}</p>
+          <button
+            className="bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 transition duration-300"
+            onClick={restartGame}
+          >
+            שחק שוב
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-orange-400 flex items-center justify-center" dir="rtl">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-2xl w-full">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-purple-800">שאלה {currentQuestion + 1} מתוך {questions.length}</h2>
+          <div className="bg-orange-100 text-orange-800 py-1 px-3 rounded-full">
+            ניקוד: {score}
+          </div>
+        </div>
+        <p className="text-lg mb-6">{name}, {questions[currentQuestion].question}</p>
+        <div className="space-y-4">
+          {questions[currentQuestion].answers.map((answer, index) => (
+            <button
+              key={index}
+              className={`w-full text-right p-3 rounded transition duration-300 ${
+                selectedAnswer === index
+                  ? index === questions[currentQuestion].correct
+                    ? 'bg-green-500 text-white'
+                    : 'bg-red-500 text-white'
+                  : 'bg-purple-100 text-purple-800 hover:bg-purple-200'
+              }`}
+              onClick={() => handleAnswer(index)}
+              disabled={answered}
+            >
+              {answer}
+            </button>
+          ))}
+        </div>
+        {answered && (
+          <Alert className="mt-4" variant={selectedAnswer === questions[currentQuestion].correct ? "default" : "destructive"}>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>{selectedAnswer === questions[currentQuestion].correct ? "נכון!" : "לא נכון."}</AlertTitle>
+            <AlertDescription>
+              {selectedAnswer !== questions[currentQuestion].correct && 
+                `התשובה הנכונה היא: ${questions[currentQuestion].answers[questions[currentQuestion].correct]}`
+              }
+            </AlertDescription>
+          </Alert>
+        )}
+        {answered && (
+          <button
+            className="w-full mt-6 bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition duration-300"
+            onClick={nextQuestion}
+          >
+            {currentQuestion < questions.length - 1 ? "לשאלה הבאה" : "סיים משחק"}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default QuizGame;
